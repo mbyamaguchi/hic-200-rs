@@ -1,1 +1,7 @@
 /target
+
+# examples
+examples/*
+
+# tmpfile
+tmp/*

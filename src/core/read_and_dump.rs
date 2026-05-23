@@ -59,7 +59,7 @@ fn midpoint_to_bin(
     Some(*meta.get("first_bin").unwrap() + local_index)
 }
 
-fn read_and_dump(
+pub fn read_and_dump(
     bin_file: &str,
     max_distance: usize,
     input_gz: &str,

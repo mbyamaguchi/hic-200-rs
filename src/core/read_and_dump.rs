@@ -1,12 +1,13 @@
-use flate2::read::GzDecoder;
 use clap::Parser;
-use std::fs::{File, BufReader};
+use flate2::read::GzDecoder;
 use std::collections::HashMap;
+use std::fs::{BufReader, File};
 use std::io::{BufRead, Write};
 
-fn load_bin_metadata(bin_file: &str) -> HashMap<String, HashMap<String, usize>> {
-
-    let mut chr_meta = HashMap<String, HashMap<String, usize>>::new();
+fn load_bin_metadata(bin_file: &str) {
+    let mut chr_meta = HashMap < String;
+    HashMap < String;
+    usize >> ::new();
 
     for result in BufReader::new(File::open(bin_file)?).lines().skip(1) {
         let line = result?.trim_end();
@@ -27,7 +28,10 @@ fn load_bin_metadata(bin_file: &str) -> HashMap<String, HashMap<String, usize>> 
             chr_meta.insert(chrom.clone(), HashMap::new("last_end", end));
         } else {
             if end > *chr_meta.get(&chrom).unwrap().get("last_end").unwrap() {
-                chr_meta.get_mut(&chrom).unwrap().insert("last_end".to_string(), end);
+                chr_meta
+                    .get_mut(&chrom)
+                    .unwrap()
+                    .insert("last_end".to_string(), end);
             }
         }
     }
@@ -39,7 +43,11 @@ fn midpoint(start: usize, end: usize) -> usize {
     ((start + end) / 2).floor() as usize
 }
 
-fn midpoint_to_bin(chrom: &str, mid: usize, chr_meta: &HashMap<String, HashMap<String, usize>>) -> Option<usize> {
+fn midpoint_to_bin(
+    chrom: &str,
+    mid: usize,
+    chr_meta: &HashMap<String, HashMap<String, usize>>,
+) -> Option<usize> {
     let meta = chr_meta.get(chrom).unwrap();
 
     if mid > *meta.get("last_end").unwrap() {
@@ -51,7 +59,12 @@ fn midpoint_to_bin(chrom: &str, mid: usize, chr_meta: &HashMap<String, HashMap<S
     Some(*meta.get("first_bin").unwrap() + local_index)
 }
 
-fn read_and_dump(bin_file: &str, max_distance: usize, input_gz: &str, output_file: &str) -> Result<(), Box<std::error::Error>> {
+fn read_and_dump(
+    bin_file: &str,
+    max_distance: usize,
+    input_gz: &str,
+    output_file: &str,
+) -> Result<(), Box<std::error::Error>> {
     let chr_meta = load_bin_metadata(bin_file);
 
     let fin = GzDecoder::new(File::open(input_gz)?);
@@ -93,17 +106,15 @@ fn read_and_dump(bin_file: &str, max_distance: usize, input_gz: &str, output_fil
             continue;
         }
 
-        bin1 = midpoint_to_bin(chrom1, mid1, &chr_meta);
-        bin2 = midpoint_to_bin(chrom2, mid2, &chr_meta);
+        let mut bin1 = midpoint_to_bin(chrom1, mid1, &chr_meta);
+        let mut bin2 = midpoint_to_bin(chrom2, mid2, &chr_meta);
 
         if bin1.is_none() || bin2.is_none() {
-            bin1, bin2 = bin2.clone(), bin1.clone();
+            bin1 = bin2.clone();
+            bin2 = bin1.clone();
         }
 
         writeln!(fout, "{}\t{}\t{}", bin1.unwrap(), bin2.unwrap(), score)?;
-
-
-        
     }
 }
 
@@ -113,7 +124,8 @@ fn read_and_dump(bin_file: &str, max_distance: usize, input_gz: &str, output_fil
     version = env!("CARGO_PKG_VERSION"),
     author = env!("CARGO_PKG_AUTHORS"),
     about = env!("CARGO_PKG_DESCRIPTION"),
-    arg_required_else_help = true,]
+    arg_required_else_help = true
+)]
 struct Cli {
     #[clap(short, long)]
     bin_file: String,
@@ -125,5 +137,10 @@ struct Cli {
 fn main() -> Result<(), Box<std::error::Error>> {
     let cli = Cli::parse();
 
-    read_and_dump(&cli.bin_file, cli.max_distance, &cli.input_gz, &cli.output_file)
+    read_and_dump(
+        &cli.bin_file,
+        cli.max_distance,
+        &cli.input_gz,
+        &cli.output_file,
+    );
 }
